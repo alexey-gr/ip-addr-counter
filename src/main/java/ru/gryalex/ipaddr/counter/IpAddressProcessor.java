@@ -32,7 +32,7 @@ public class IpAddressProcessor {
                 processedCount++;
                 if (processedCount % BATCH_LOGGING_INTERVAL == 0) {
                     long batchProcessingTime = System.currentTimeMillis() - batchStartTime;
-                    long rps = BATCH_LOGGING_INTERVAL / batchProcessingTime * 1000;
+                    long rps = (long) (1f * BATCH_LOGGING_INTERVAL / batchProcessingTime * 1000);
                     System.out.printf("- processed: %s, speed: %s rps%n", processedCount, rps);
                     batchStartTime = System.currentTimeMillis();
                 }

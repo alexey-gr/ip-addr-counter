@@ -91,7 +91,10 @@ public class OptimizedIpAddressHolder implements IpAddressHolder {
     }
 
     static int setBitInByteWithMask(int unsignedByte, int rightBits3) {
-        int bitmask = (int) Math.pow(2, rightBits3);
+        if (rightBits3 < 0 || rightBits3 > 7) {
+            throw new IllegalArgumentException("rightBits3 must be between 0 and 7 but was " + rightBits3);
+        }
+        int bitmask = 1 << rightBits3;
         return unsignedByte | bitmask;
     }
 
