@@ -12,9 +12,14 @@ public class IpAddressProcessor {
 
     private static final int BATCH_LOGGING_INTERVAL = 1_000_000;
 
-    static long calculateUniqueCount(Path path) throws IOException {
+    private final IpAddressHolder ipAddressHolder;
+
+    public IpAddressProcessor(IpAddressHolder ipAddressHolder) {
+        this.ipAddressHolder = ipAddressHolder;
+    }
+
+    long calculateUniqueCount(Path path) throws IOException {
         System.out.printf("Counting unique ip addresses in %s%n", path);
-        var ipAddressHolder = new OptimizedIpAddressHolder();
 
         try (var reader = Files.newBufferedReader(path)) {
             String ipAddress;
@@ -45,6 +50,9 @@ public class IpAddressProcessor {
             System.exit(1);
         }
         var path = Paths.get(args[0]);
-        calculateUniqueCount(path);
+
+        var ipAddressHolder = new OptimizedIpAddressHolder();
+        var ipAddressProcessor = new IpAddressProcessor(ipAddressHolder);
+        ipAddressProcessor.calculateUniqueCount(path);
     }
 }

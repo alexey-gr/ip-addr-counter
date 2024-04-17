@@ -14,7 +14,7 @@ class OptimizedIpAddressHolderTest {
 
     private static final List<String> IP_ADDRESSES = List.of("145.67.23.4", "8.34.5.23", "89.54.3.124", "89.54.3.124", "3.45.71.5");
 
-    private final OptimizedIpAddressHolder ipAddressHolder = new OptimizedIpAddressHolder();
+    private final IpAddressHolder ipAddressHolder = new OptimizedIpAddressHolder();
 
     @Test
     void testCalculateUniqueCount() {
