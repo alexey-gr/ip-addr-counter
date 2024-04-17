@@ -51,7 +51,23 @@ class OptimizedIpAddressHolderTest {
         assertEquals(3162459927L, encodedIpAddress);
     }
 
+    @ParameterizedTest
+    @MethodSource("provideSetBitInByteWithMaskParameters")
+    void testSetBitInByteWithMask(int rightBits3, int expected) {
+        int result = OptimizedIpAddressHolder.setBitInByteWithMask(0, rightBits3);
+        assertEquals(expected, result);
+    }
+
     private static Stream<Arguments> provideIpAddressParameters() {
         return IP_ADDRESSES.stream().map(Arguments::of);
+    }
+
+    private static Stream<Arguments> provideSetBitInByteWithMaskParameters() {
+        return Stream.of(
+                Arguments.of(0b000, 0b00000001),
+                Arguments.of(0b001, 0b00000010),
+                Arguments.of(0b110, 0b01000000),
+                Arguments.of(0b111, 0b10000000)
+        );
     }
 }

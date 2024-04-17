@@ -35,31 +35,28 @@ public class OptimizedIpAddressHolder implements IpAddressHolder {
         int rightBits3 = rightBits16 & 0b111;
 
         // get bucket by left 16 bits of ip address
-        var bucket = retrieveBucket(leftBits16);
+        byte[] bucket = retrieveBucket(leftBits16);
 
         // get value by middle 13 bits of ip address
-        int value = bucket[middleBits13];
-        value -= Byte.MIN_VALUE;
+        byte signedByte = bucket[middleBits13];
+        int unsignedByte = toUnsignedByte(signedByte);
 
         // right 3 bits of ip address equals 8 in decimal - we encode them as a position of '1' bit in byte value
-        value = applyBitmask(rightBits3, value);
-        value += Byte.MIN_VALUE;
-        bucket[middleBits13] = (byte) (value);
+        int value = setBitInByteWithMask(unsignedByte, rightBits3);
+        bucket[middleBits13] = toSignedByte(value);
     }
 
     @Override
     public long calculateUniqueCount() {
         long count = 0;
-
         for (byte[] bucket : holder) {
             if (bucket != null) {
-                for (int value : bucket) {
-                    value = value - Byte.MIN_VALUE;
-                    count += Integer.bitCount(value);
+                for (byte signedByte : bucket) {
+                    int unsignedByte = toUnsignedByte(signedByte);
+                    count += Integer.bitCount(unsignedByte);
                 }
             }
         }
-
         return count;
     }
 
@@ -87,15 +84,25 @@ public class OptimizedIpAddressHolder implements IpAddressHolder {
         byte[] bucket = holder[leftBits16];
         if (bucket == null) {
             bucket = new byte[MIDDLE_13_BITS_RANGE];
-            Arrays.fill(bucket, Byte.MIN_VALUE);
+            Arrays.fill(bucket, toSignedByte(0));
             holder[leftBits16] = bucket;
         }
         return bucket;
     }
 
-    private static int applyBitmask(int rightBits3, int value) {
+    static int setBitInByteWithMask(int unsignedByte, int rightBits3) {
         int bitmask = (int) Math.pow(2, rightBits3);
-        value |= bitmask;
-        return value;
+        return unsignedByte | bitmask;
+    }
+
+    private static byte toSignedByte(int unsignedByte) {
+        if (unsignedByte < 0 || unsignedByte > 255) {
+            throw new IllegalArgumentException("Value must be between 0 and 255 but was " + unsignedByte);
+        }
+        return (byte) (unsignedByte + Byte.MIN_VALUE);
+    }
+
+    private static int toUnsignedByte(byte signedByte) {
+        return signedByte - Byte.MIN_VALUE;
     }
 }
