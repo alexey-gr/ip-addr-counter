@@ -26,6 +26,10 @@ public class OptimizedIpAddressHolder implements IpAddressHolder {
 
     @Override
     public void add(String ipAddress) {
+        if (ipAddress == null) {
+            throw new IllegalArgumentException("ipAddress cannot be null");
+        }
+
         // encode ip address
         long ipAddressBits32 = encodeIpAddress(ipAddress);
         int rightBits16 = (int) (ipAddressBits32 & 0xFFFF);
@@ -61,20 +65,35 @@ public class OptimizedIpAddressHolder implements IpAddressHolder {
     }
 
     static long encodeIpAddress(String ipAddress) {
-        long encoded = 0;
-        int octet = 0;
+        long result = 0;
+        int octetValue = 0;
+        int octetCount = 0;
 
         for (char currentChar : ipAddress.toCharArray()) {
             if (currentChar != '.') {
                 int number = currentChar - '0';
-                octet = octet * 10 + number;
+                octetValue = octetValue * 10 + number;
             } else {
-                encoded <<= 8;
-                encoded |= octet;
-                octet = 0;
+                result = appendOctet(result, octetValue);
+                octetCount++;
+                octetValue = 0;
             }
         }
 
+        result = appendOctet(result, octetValue);
+        octetCount++;
+
+        if (octetCount != 4) {
+            throw new IllegalArgumentException("Invalid IP address format " + ipAddress);
+        }
+
+        return result;
+    }
+
+    private static long appendOctet(long encoded, int octet) {
+        if (octet < 0 || octet > 255) {
+            throw new IllegalArgumentException("octet must be between 0 and 255 but was " + octet);
+        }
         encoded <<= 8;
         encoded |= octet;
         return encoded;

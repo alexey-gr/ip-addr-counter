@@ -1,5 +1,6 @@
 package ru.gryalex.ipaddr.counter;
 
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -19,6 +20,12 @@ public class IpAddressProcessor {
     }
 
     long calculateUniqueCount(Path path) throws IOException {
+        if (path == null) {
+            throw new IllegalArgumentException("Path cannot be null");
+        }
+        if (!Files.exists(path)) {
+            throw new FileNotFoundException("File does not exist: " + path);
+        }
         System.out.printf("Counting unique ip addresses in %s%n", path);
 
         try (var reader = Files.newBufferedReader(path)) {

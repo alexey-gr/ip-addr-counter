@@ -9,6 +9,7 @@ import java.util.List;
 import java.util.stream.Stream;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 class OptimizedIpAddressHolderTest {
 
@@ -17,25 +18,42 @@ class OptimizedIpAddressHolderTest {
     private final IpAddressHolder ipAddressHolder = new OptimizedIpAddressHolder();
 
     @Test
-    void testCalculateUniqueCount() {
+    void testAddNullIp() {
+        assertThrows(
+                IllegalArgumentException.class,
+                () -> ipAddressHolder.add(null)
+        );
+    }
+
+    @Test
+    void testAddInvalidIp() {
+        assertThrows(
+                IllegalArgumentException.class,
+                () -> ipAddressHolder.add("invalid-ip")
+        );
+    }
+
+    @Test
+    void testCalculateScenario() {
         IP_ADDRESSES.forEach(ipAddressHolder::add);
         assertEquals(4, ipAddressHolder.calculateUniqueCount(), "Calculate unique count failed");
     }
 
     @Test
-    void testEmpty() {
+    void testCalculateEmpty() {
         assertEquals(0, ipAddressHolder.calculateUniqueCount(), "Calculate unique count failed");
     }
 
     @ParameterizedTest
     @MethodSource("provideIpAddressParameters")
-    void testSingleCount(String ipAddress) {
+    void testCalculateSingleCount(String ipAddress) {
+        ipAddressHolder.add(ipAddress);
         ipAddressHolder.add(ipAddress);
         assertEquals(1, ipAddressHolder.calculateUniqueCount(), ipAddress + " should be unique");
     }
 
     @Test
-    void testContinuousRange() {
+    void testCalculateContinuousRange() {
         for (int i = 0; i < 255; i++) {
             String ipAddress = "0.0.0." + i;
             ipAddressHolder.add(ipAddress);

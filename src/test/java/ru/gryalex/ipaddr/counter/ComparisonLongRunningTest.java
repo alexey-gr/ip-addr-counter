@@ -11,7 +11,7 @@ import static java.util.stream.Collectors.joining;
 import static java.util.stream.Collectors.toList;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-public class ComparisonLongRunningTest {
+class ComparisonLongRunningTest {
 
     private static final int TOTAL_IP_ADDRESSES_COUNT = 10_000_000;
     private static final int MAX_DUPLICATE_COUNT = 10;
